@@ -1,0 +1,38 @@
+{
+  "discovery_version": "1.0.0",
+  "generator": "tc-oss-dependency-discovery",
+  "registry_version": "1.0.0",
+  "scan_status": "OK",
+  "summary": {
+    "files_scanned": 1,
+    "candidates": 1,
+    "admitted_match": 0,
+    "pending_admission": 0,
+    "unpinned_blocked": 1
+  },
+  "errors": [],
+  "scanned_files": [
+    ".github/workflows/oss-admission-ci.yml"
+  ],
+  "candidates": [
+    {
+      "candidate_id": "github-action:actions/checkout@v4",
+      "ecosystem": "github-action",
+      "component": "actions/checkout",
+      "source_url": "https://github.com/actions/checkout",
+      "declared_ref": "v4",
+      "ref_kind": "tag",
+      "pinned": false,
+      "immutable_ref": null,
+      "status": "UNPINNED_BLOCKED",
+      "matched_admission_id": null,
+      "reason": "declared ref 'v4' is a tag; an immutable ref is required",
+      "occurrences": [
+        {
+          "file": ".github/workflows/oss-admission-ci.yml",
+          "locator": "line 12"
+        }
+      ]
+    }
+  ]
+}

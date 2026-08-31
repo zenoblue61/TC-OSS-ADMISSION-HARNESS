@@ -1,0 +1,9 @@
+{
+  "vendored_sources_version": "1.0.0",
+  "sources": [
+    {
+      "component": "no-source-url",
+      "path": "vendor/no-source-url"
+    }
+  ]
+}
