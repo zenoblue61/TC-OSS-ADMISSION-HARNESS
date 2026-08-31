@@ -12,6 +12,18 @@
       "reviewed_at": "2026-08-31",
       "evidence_refs": ["evidence/example-approved-git-source.json"],
       "jarvis_ledger": {"ledger_id": "oss.example-approved-git-source", "governance_status": "ADMITTED"}
+    },
+    {
+      "admission_id": "oss-actions-checkout",
+      "component": "actions/checkout",
+      "source": {"type": "git", "source_url": "https://github.com/actions/checkout", "immutable_ref": "11d5960a326750d5838078e36cf38b85af677262"},
+      "license": "MIT",
+      "intended_use": "CI only; checks out this repository for the OSS Admission Gate workflow. Not shipped in any product artifact.",
+      "status": "APPROVED",
+      "owner": "tc.governance",
+      "reviewed_at": "2026-08-31",
+      "evidence_refs": ["evidence/actions-checkout.json"],
+      "jarvis_ledger": {"ledger_id": "oss.actions-checkout", "governance_status": "ADMITTED"}
     }
   ]
 }

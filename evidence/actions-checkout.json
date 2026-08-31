@@ -1,0 +1,22 @@
+{
+  "evidence_version": "1.0.0",
+  "admission_id": "oss-actions-checkout",
+  "collected_at": "2026-08-31T00:00:00Z",
+  "source_license": "MIT",
+  "immutable_ref": "11d5960a326750d5838078e36cf38b85af677262",
+  "ref_provenance": {
+    "resolved_from": "refs/tags/v4",
+    "equivalent_release_tag": "v4.4.0",
+    "resolution_method": "git ls-remote --tags https://github.com/actions/checkout",
+    "object_type": "commit",
+    "commit_authored_at": "2026-07-16T15:43:47-04:00",
+    "commit_subject": "backport fixes to releases-v4 (#2524)"
+  },
+  "license_verification": {
+    "file": "LICENSE",
+    "at_ref": "11d5960a326750d5838078e36cf38b85af677262",
+    "spdx": "MIT",
+    "verified_header": "The MIT License (MIT)"
+  },
+  "note": "The floating tag v4 was replaced with the commit it resolved to at review time. Re-review is required before moving to any later ref."
+}

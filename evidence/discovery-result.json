@@ -6,9 +6,9 @@
   "summary": {
     "files_scanned": 1,
     "candidates": 1,
-    "admitted_match": 0,
+    "admitted_match": 1,
     "pending_admission": 0,
-    "unpinned_blocked": 1
+    "unpinned_blocked": 0
   },
   "errors": [],
   "scanned_files": [
@@ -16,21 +16,21 @@
   ],
   "candidates": [
     {
-      "candidate_id": "github-action:actions/checkout@v4",
+      "candidate_id": "github-action:actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
       "ecosystem": "github-action",
       "component": "actions/checkout",
       "source_url": "https://github.com/actions/checkout",
-      "declared_ref": "v4",
-      "ref_kind": "tag",
-      "pinned": false,
-      "immutable_ref": null,
-      "status": "UNPINNED_BLOCKED",
-      "matched_admission_id": null,
-      "reason": "declared ref 'v4' is a tag; an immutable ref is required",
+      "declared_ref": "11d5960a326750d5838078e36cf38b85af677262",
+      "ref_kind": "commit_sha",
+      "pinned": true,
+      "immutable_ref": "11d5960a326750d5838078e36cf38b85af677262",
+      "status": "ADMITTED_MATCH",
+      "matched_admission_id": "oss-actions-checkout",
+      "reason": "source_url and immutable_ref match an APPROVED registry record",
       "occurrences": [
         {
           "file": ".github/workflows/oss-admission-ci.yml",
-          "locator": "line 12"
+          "locator": "line 14"
         }
       ]
     }

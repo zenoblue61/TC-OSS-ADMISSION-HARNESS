@@ -95,8 +95,28 @@ CI는 `--check`만 사용합니다. 발견 자체는 게이트가 아니라 증�
 validator와 사람의 심사가 결정합니다. 소비 저장소에서 미승인 의존성 유입을 차단하려면
 `--strict`를 사용하십시오.
 
-> 현재 이 저장소의 워크플로는 `actions/checkout@v4`를 사용하므로 발견기가 스스로를
-> `UNPINNED_BLOCKED`로 보고합니다. SHA 고정에는 네트워크 조회가 필요하여 이번 범위 밖입니다.
+현재 이 저장소는 자기 자신에게 정책을 적용하고 있습니다. 워크플로의 action은 commit SHA로
+고정되어 있고 registry에 승인 record가 있으므로 발견 결과는 `unpinned_blocked: 0`,
+`pending_admission: 0`이며 `--strict`도 종료 코드 0으로 통과합니다.
+
+### GitHub Action 고정 절차
+
+`OSS_ADMISSION_POLICY.md` 규칙 2에 따라 action은 태그가 아닌 commit SHA로 고정합니다.
+
+```bash
+git ls-remote --tags --refs https://github.com/<owner>/<repo> | grep 'refs/tags/<tag>$'
+```
+
+1. 위 명령으로 태그가 가리키는 commit SHA를 확인한다. 주석 태그(annotated tag)면
+   `refs/tags/<tag>^{}`의 값이 commit SHA다.
+2. 워크플로를 `uses: <owner>/<repo>@<40자리 SHA> # <release tag>`로 고정한다.
+   태그는 이동 가능하므로 주석으로만 남기고, 대조 기준은 SHA다.
+3. `registry/oss-registry.json`에 승인 record를, `evidence/`에 라이선스와 ref 출처를 담은
+   evidence 파일을 추가한다.
+4. `python3 scripts/discover_dependencies.py`로 발견 증거를 재생성한다.
+5. `validate_admissions.py` PASS와 `discover_dependencies.py --check` PASS를 확인한다.
+
+태그는 이동할 수 있으므로 SHA를 바꾸는 것은 새로운 심사 대상입니다. 자동 갱신하지 않습니다.
 
 ## TC-JARVIS 연결
 
