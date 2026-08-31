@@ -1,0 +1,17 @@
+{
+  "registry_version": "1.0.0",
+  "records": [
+    {
+      "admission_id": "oss-example-approved-git-source",
+      "component": "example-approved-git-source",
+      "source": {"type": "git", "source_url": "https://github.com/example/example", "immutable_ref": "0123456789abcdef0123456789abcdef01234567"},
+      "license": "MIT",
+      "intended_use": "Fixture only; validates the admission contract without importing production code.",
+      "status": "APPROVED",
+      "owner": "tc.governance",
+      "reviewed_at": "2026-08-31",
+      "evidence_refs": ["evidence/example-approved-git-source.json"],
+      "jarvis_ledger": {"ledger_id": "oss.example-approved-git-source", "governance_status": "ADMITTED"}
+    }
+  ]
+}
