@@ -1,0 +1,9 @@
+# Discovery fixture: mixes exact pins, ranges and direct git references.
+requests==2.31.0
+urllib3>=1.26,<3
+flask
+pinned-extra[security]==3.0.1 ; python_version >= "3.11"
+example-git @ git+https://github.com/example/py-lib.git@2222222222222222222222222222222222222222
+-e git+https://github.com/example/py-edge.git@develop#egg=py-edge
+-r requirements-dev.txt
+--index-url https://pypi.org/simple
