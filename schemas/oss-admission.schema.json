@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TC OSS admission record",
+  "type": "object",
+  "required": ["admission_id", "component", "source", "license", "intended_use", "status", "owner", "reviewed_at", "evidence_refs", "jarvis_ledger"],
+  "properties": {
+    "admission_id": {"type": "string", "pattern": "^oss-[a-z0-9-]+$"},
+    "component": {"type": "string", "minLength": 1},
+    "source": {
+      "type": "object", "required": ["type", "source_url", "immutable_ref"],
+      "properties": {
+        "type": {"enum": ["git", "npm", "pypi"]},
+        "source_url": {"type": "string", "format": "uri"},
+        "immutable_ref": {"type": "string", "minLength": 1}
+      }, "additionalProperties": false
+    },
+    "license": {"type": "string", "minLength": 1},
+    "intended_use": {"type": "string", "minLength": 1},
+    "status": {"enum": ["PENDING", "APPROVED", "BLOCKED", "REVOKED"]},
+    "owner": {"type": "string", "minLength": 1},
+    "reviewed_at": {"type": "string", "format": "date"},
+    "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^evidence/"}},
+    "jarvis_ledger": {"type": "object", "required": ["ledger_id", "governance_status"], "properties": {"ledger_id": {"type": "string", "pattern": "^oss\\."}, "governance_status": {"enum": ["ADMITTED", "PENDING", "BLOCKED", "REVOKED"]}}, "additionalProperties": false},
+    "exception_approval": {"type": "object", "required": ["approved_by", "rationale", "expires_at"], "properties": {"approved_by": {"type": "string"}, "rationale": {"type": "string"}, "expires_at": {"type": "string", "format": "date"}}, "additionalProperties": false}
+  }, "additionalProperties": false
+}

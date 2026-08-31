@@ -1,0 +1,8 @@
+{
+  "evidence_version": "1.0.0",
+  "admission_id": "oss-example-approved-git-source",
+  "collected_at": "2026-08-31T00:00:00Z",
+  "source_license": "MIT",
+  "immutable_ref": "0123456789abcdef0123456789abcdef01234567",
+  "note": "Non-production fixture record. Replace before admitting a real source."
+}
