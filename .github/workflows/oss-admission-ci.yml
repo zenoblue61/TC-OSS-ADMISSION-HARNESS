@@ -12,5 +12,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate OSS admissions
         run: python3 scripts/validate_admissions.py
+      - name: Discover OSS dependency candidates
+        # --check re-runs discovery read-only and fails when the committed
+        # evidence is stale or any manifest is missing/malformed. It never
+        # installs, resolves or writes anything.
+        run: python3 scripts/discover_dependencies.py --check
       - name: Run admission contract tests
         run: python3 -m unittest discover -s tests -v

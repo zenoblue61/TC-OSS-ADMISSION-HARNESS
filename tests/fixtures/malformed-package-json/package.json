@@ -1,0 +1,5 @@
+{
+  "name": "broken",
+  "dependencies": {
+    "left-pad": "1.3.0",
+  }

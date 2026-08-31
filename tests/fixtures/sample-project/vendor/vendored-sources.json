@@ -1,0 +1,17 @@
+{
+  "vendored_sources_version": "1.0.0",
+  "sources": [
+    {
+      "component": "vendored-crypto",
+      "path": "vendor/vendored-crypto",
+      "source_url": "https://github.com/example/vendored-crypto",
+      "immutable_ref": "5555555555555555555555555555555555555555"
+    },
+    {
+      "component": "vendored-floating",
+      "path": "vendor/vendored-floating",
+      "source_url": "https://github.com/example/vendored-floating",
+      "ref": "release-1.x"
+    }
+  ]
+}

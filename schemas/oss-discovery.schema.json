@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TC OSS dependency discovery result",
+  "description": "Deterministic, timestamp-free evidence produced by scripts/discover_dependencies.py. Discovery never admits a source; it only reports candidates.",
+  "type": "object",
+  "required": ["discovery_version", "generator", "scan_status", "summary", "errors", "scanned_files", "candidates"],
+  "properties": {
+    "discovery_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "generator": {"const": "tc-oss-dependency-discovery"},
+    "registry_version": {"type": ["string", "null"]},
+    "scan_status": {
+      "enum": ["OK", "FAIL"],
+      "description": "FAIL whenever any input was missing or malformed. Fail-closed: findings from a FAIL scan are incomplete and must not be treated as a clean bill."
+    },
+    "summary": {
+      "type": "object",
+      "required": ["files_scanned", "candidates", "admitted_match", "pending_admission", "unpinned_blocked"],
+      "properties": {
+        "files_scanned": {"type": "integer", "minimum": 0},
+        "candidates": {"type": "integer", "minimum": 0},
+        "admitted_match": {"type": "integer", "minimum": 0},
+        "pending_admission": {"type": "integer", "minimum": 0},
+        "unpinned_blocked": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "errors": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Sorted fail-closed input errors: unreadable, malformed or missing declared inputs."
+    },
+    "scanned_files": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[^/]"},
+      "description": "Sorted repository-relative POSIX paths. Absolute paths are never emitted."
+    },
+    "candidates": {
+      "type": "array",
+      "description": "Sorted by (ecosystem, component, source_url, declared_ref) so output is independent of filesystem order.",
+      "items": {
+        "type": "object",
+        "required": ["candidate_id", "ecosystem", "component", "source_url", "declared_ref", "ref_kind", "pinned", "immutable_ref", "status", "matched_admission_id", "reason", "occurrences"],
+        "properties": {
+          "candidate_id": {"type": "string", "minLength": 1},
+          "ecosystem": {"enum": ["npm", "pypi", "github-action", "git", "docker", "url"]},
+          "component": {"type": "string", "minLength": 1},
+          "source_url": {"type": "string", "minLength": 1},
+          "declared_ref": {"type": "string", "minLength": 1},
+          "ref_kind": {
+            "enum": ["commit_sha", "exact_version", "digest", "version_range", "tag", "branch", "latest", "unspecified"],
+            "description": "commit_sha, exact_version and digest are immutable; every other kind floats and is blocked."
+          },
+          "pinned": {"type": "boolean"},
+          "immutable_ref": {
+            "type": ["string", "null"],
+            "description": "Canonicalised ref used for registry matching; null when the candidate is not pinned."
+          },
+          "status": {
+            "enum": ["ADMITTED_MATCH", "PENDING_ADMISSION", "UNPINNED_BLOCKED"],
+            "description": "APPROVED is intentionally absent. Discovery can never admit a source."
+          },
+          "matched_admission_id": {"type": ["string", "null"]},
+          "reason": {"type": "string", "minLength": 1},
+          "occurrences": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Sorted by (file, locator); every place the candidate was declared.",
+            "items": {
+              "type": "object",
+              "required": ["file", "locator"],
+              "properties": {
+                "file": {"type": "string", "pattern": "^[^/]"},
+                "locator": {"type": "string", "minLength": 1},
+                "integrity": {"type": "string", "minLength": 1}
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {"properties": {"status": {"const": "ADMITTED_MATCH"}}},
+            "then": {
+              "properties": {"pinned": {"const": true}, "matched_admission_id": {"type": "string"}},
+              "required": ["matched_admission_id"]
+            }
+          },
+          {
+            "if": {"properties": {"status": {"const": "UNPINNED_BLOCKED"}}},
+            "then": {"properties": {"pinned": {"const": false}, "immutable_ref": {"type": "null"}, "matched_admission_id": {"type": "null"}}}
+          },
+          {
+            "if": {"properties": {"status": {"const": "PENDING_ADMISSION"}}},
+            "then": {"properties": {"pinned": {"const": true}, "matched_admission_id": {"type": "null"}}}
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

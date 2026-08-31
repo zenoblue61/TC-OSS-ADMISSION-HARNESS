@@ -27,3 +27,21 @@
 ```
 
 `validation-result.json`이 `PASS`가 아닌 record는 TC-JARVIS에서 invocable dependency 또는 reusable source로 등록할 수 없다.
+
+## 발견 증거 (P3)
+
+`evidence/discovery-result.json`은 아직 승인되지 않은 유입 후보를 상위 레저에 노출한다. 이 파일은
+레저 record를 만들지 않으며, 심사 대기열의 입력으로만 쓴다.
+
+| Discovery field | Jarvis ledger field | 규칙 |
+| --- | --- | --- |
+| `candidate_id` | `candidate_id` | 심사 큐 내에서만 유효한 임시 식별자 |
+| `source_url` | `source_url` | 정규화된 HTTPS URL |
+| `immutable_ref` | `pinned_ref` | `null`이면 고정되지 않은 후보 |
+| `status` | `discovery_status` | `ADMITTED_MATCH` / `PENDING_ADMISSION` / `UNPINNED_BLOCKED` |
+| `matched_admission_id` | `source_record_id` | `ADMITTED_MATCH`일 때만 채워진다 |
+| `occurrences[].file` | `declared_in` | 저장소 상대 경로 |
+
+`discovery_status`는 `admission_status`가 아니다. `ADMITTED_MATCH`는 "이미 승인된 record와 일치한다"는
+관찰일 뿐이며, 승인 자체는 언제나 `registry/oss-registry.json`이 권위를 가진다. `scan_status`가 `FAIL`인
+발견 결과는 불완전하므로 심사 판단 근거로 사용할 수 없다.
