@@ -91,9 +91,20 @@ python3 scripts/discover_dependencies.py --strict   # 미승인 후보가 하나
 python3 scripts/discover_dependencies.py --exclude <prefix>
 ```
 
-CI는 `--check`만 사용합니다. 발견 자체는 게이트가 아니라 증거 생성이며, 승인 여부는 P0~P2
-validator와 사람의 심사가 결정합니다. 소비 저장소에서 미승인 의존성 유입을 차단하려면
-`--strict`를 사용하십시오.
+CI는 `--check --strict`를 함께 사용합니다. 두 플래그는 독립적으로 동작하므로 둘 다 필요합니다.
+
+| 플래그 | 막는 것 |
+| --- | --- |
+| `--check` | 커밋된 evidence가 낡았거나 입력이 손상된 경우 |
+| `--strict` | `ADMITTED_MATCH`가 아닌 후보가 하나라도 있는 경우 |
+
+`--check`는 쓰기를 하지 않으므로 CI 실행이 읽기 전용으로 유지됩니다. `--check` 없이 `--strict`만
+주면 발견기가 evidence 파일을 그 자리에서 덮어쓰므로, CI에서는 반드시 함께 사용하십시오.
+
+발견기가 승인을 만들지는 않습니다. `--strict`는 registry에 승인 record가 없는 소스의 유입을
+차단할 뿐이고, 승인 자체는 여전히 P0~P2 validator와 사람의 심사가 결정합니다. 새 의존성을
+추가하려면 소스를 불변 ref로 고정하고 registry record와 evidence를 추가한 뒤 발견 증거를
+재생성해야 CI가 통과합니다.
 
 현재 이 저장소는 자기 자신에게 정책을 적용하고 있습니다. 워크플로의 action은 commit SHA로
 고정되어 있고 registry에 승인 record가 있으므로 발견 결과는 `unpinned_blocked: 0`,
