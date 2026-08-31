@@ -24,6 +24,18 @@
       "reviewed_at": "2026-08-31",
       "evidence_refs": ["evidence/actions-checkout.json"],
       "jarvis_ledger": {"ledger_id": "oss.actions-checkout", "governance_status": "ADMITTED"}
+    },
+    {
+      "admission_id": "oss-andrej-karpathy-skills",
+      "component": "andrej-karpathy-skills",
+      "source": {"type": "git", "source_url": "https://github.com/multica-ai/andrej-karpathy-skills", "immutable_ref": "2c606141936f1eeef17fa3043a72095b4765b9c2"},
+      "license": "MIT",
+      "intended_use": "Development guidance only; vendored as the Claude Code skill at .claude/skills/karpathy-guidelines. Documentation text, not executable code, and not shipped in any product artifact.",
+      "status": "APPROVED",
+      "owner": "tc.governance",
+      "reviewed_at": "2026-08-31",
+      "evidence_refs": ["evidence/andrej-karpathy-skills.json"],
+      "jarvis_ledger": {"ledger_id": "oss.andrej-karpathy-skills", "governance_status": "ADMITTED"}
     }
   ]
 }
