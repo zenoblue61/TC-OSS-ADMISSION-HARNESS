@@ -14,6 +14,8 @@ Contract: docs/JARVIS_LEDGER_ADAPTER.md
 """
 
 import re
+import shutil
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -138,6 +140,22 @@ class BaselineInvariants(unittest.TestCase):
     def test_failures_are_not_swallowed(self):
         self.assertNotIn("continue-on-error", workflow(),
                          "FAIL(1) and ERROR(2) must both fail the job")
+
+    def test_workflow_is_valid_yaml_according_to_a_real_parser(self):
+        """Every other test here matches text, which is exactly how a broken
+        block scalar once reached CI: the strings were all present, but the
+        YAML around them did not parse and GitHub failed the run before any
+        job started. Python's standard library has no YAML parser, so use
+        Ruby's Psych. A missing interpreter fails loudly rather than skipping:
+        an unverified workflow is the state this test exists to prevent."""
+        ruby = shutil.which("ruby")
+        self.assertIsNotNone(
+            ruby, "ruby is required to parse the workflow; refusing to leave it unverified")
+        result = subprocess.run(
+            [ruby, "-e", 'require "yaml"; Psych.parse_file(ARGV.fetch(0))', str(WORKFLOW)],
+            capture_output=True, text=True, timeout=60, check=False)
+        self.assertEqual(result.returncode, 0,
+                         f"workflow is not valid YAML:\n{result.stderr.strip()}")
 
 
 if __name__ == "__main__":
