@@ -15,9 +15,11 @@ jobs:
       - name: Validate OSS admissions
         run: python3 scripts/validate_admissions.py
       - name: Discover OSS dependency candidates
-        # --check re-runs discovery read-only and fails when the committed
-        # evidence is stale or any manifest is missing/malformed. It never
-        # installs, resolves or writes anything.
-        run: python3 scripts/discover_dependencies.py --check
+        # --check fails when the committed evidence is stale or any manifest is
+        # missing/malformed; --strict additionally fails when any candidate is
+        # not ADMITTED_MATCH. The two are independent, so both are required to
+        # gate freshness and admission. --check also keeps the run read-only:
+        # without it, discovery would rewrite the evidence file in place.
+        run: python3 scripts/discover_dependencies.py --check --strict
       - name: Run admission contract tests
         run: python3 -m unittest discover -s tests -v

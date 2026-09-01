@@ -474,6 +474,30 @@ class CommandLineTest(unittest.TestCase):
         code, _, err = self.run_cli(["--check"])
         self.assertEqual(code, 0, err or "regenerate evidence/discovery-result.json")
 
+    def test_check_and_strict_are_enforced_independently(self):
+        # The CI step runs both flags; neither may mask the other.
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "discovery-result.json"
+            argv = ["--root", str(SAMPLE), "--registry", str(APPROVING_REGISTRY),
+                    "--output", str(output)]
+            self.assertEqual(self.run_cli(argv)[0], 0)
+
+            # Evidence is current, so only --strict may fire.
+            code, _, err = self.run_cli(argv + ["--check", "--strict"])
+            self.assertEqual(code, 1)
+            self.assertNotIn("DISCOVERY_EVIDENCE_STALE", err)
+
+            # Stale evidence fires --check, and --check must keep the run read-only.
+            output.write_text(json.dumps({"drifted": True}))
+            code, _, err = self.run_cli(argv + ["--check", "--strict"])
+            self.assertEqual(code, 1)
+            self.assertIn("DISCOVERY_EVIDENCE_STALE", err)
+            self.assertEqual(json.loads(output.read_text()), {"drifted": True})
+
+    def test_repository_satisfies_the_ci_gate(self):
+        code, _, err = self.run_cli(["--check", "--strict"])
+        self.assertEqual(code, 0, err or "repository no longer passes --check --strict")
+
 
 if __name__ == "__main__":
     unittest.main()
