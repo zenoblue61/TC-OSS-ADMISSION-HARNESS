@@ -4,17 +4,37 @@
   "registry_version": "1.0.0",
   "scan_status": "OK",
   "summary": {
-    "files_scanned": 1,
-    "candidates": 1,
-    "admitted_match": 1,
+    "files_scanned": 2,
+    "candidates": 2,
+    "admitted_match": 2,
     "pending_admission": 0,
     "unpinned_blocked": 0
   },
   "errors": [],
   "scanned_files": [
-    ".github/workflows/oss-admission-ci.yml"
+    ".github/workflows/oss-admission-ci.yml",
+    "vendor/vendored-sources.json"
   ],
   "candidates": [
+    {
+      "candidate_id": "git:andrej-karpathy-skills@2c606141936f1eeef17fa3043a72095b4765b9c2",
+      "ecosystem": "git",
+      "component": "andrej-karpathy-skills",
+      "source_url": "https://github.com/multica-ai/andrej-karpathy-skills",
+      "declared_ref": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+      "ref_kind": "commit_sha",
+      "pinned": true,
+      "immutable_ref": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+      "status": "ADMITTED_MATCH",
+      "matched_admission_id": "oss-andrej-karpathy-skills",
+      "reason": "source_url and immutable_ref match an APPROVED registry record",
+      "occurrences": [
+        {
+          "file": "vendor/vendored-sources.json",
+          "locator": "sources[0]"
+        }
+      ]
+    },
     {
       "candidate_id": "github-action:actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
       "ecosystem": "github-action",

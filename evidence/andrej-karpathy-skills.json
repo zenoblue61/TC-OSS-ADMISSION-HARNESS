@@ -1,0 +1,32 @@
+{
+  "evidence_version": "1.0.0",
+  "admission_id": "oss-andrej-karpathy-skills",
+  "collected_at": "2026-08-31T00:00:00Z",
+  "source_license": "MIT",
+  "immutable_ref": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+  "ref_provenance": {
+    "resolved_from": "refs/heads/main",
+    "resolution_method": "git clone --depth 1 https://github.com/multica-ai/andrej-karpathy-skills",
+    "object_type": "commit",
+    "note": "The upstream repository publishes no tags or releases; the ref is the default-branch head at review time, recorded here as an immutable commit."
+  },
+  "license_verification": {
+    "spdx": "MIT",
+    "declared_in": [
+      ".claude-plugin/plugin.json (\"license\": \"MIT\")",
+      "skills/karpathy-guidelines/SKILL.md (frontmatter: license: MIT)",
+      "README.md (## License / MIT)"
+    ],
+    "license_text_file_present": false,
+    "finding": "The MIT identifier is declared in three places but the repository ships no LICENSE file, so the full license text and copyright holder are absent. Reviewed and accepted as MIT on the strength of the three consistent declarations."
+  },
+  "vendored_files": [
+    {
+      "path": ".claude/skills/karpathy-guidelines/SKILL.md",
+      "upstream_path": "skills/karpathy-guidelines/SKILL.md",
+      "sha256": "6e22cc54cb02a5e98ae42d06d9d7292db0c1b43894831b32879beb0166b2aea7",
+      "modified": false
+    }
+  ],
+  "note": "Vendored verbatim. Upstream has no release tags, so any ref change is a new review. Only the Claude Code skill is vendored; the plugin manifests, Cursor rule and documentation are not."
+}
