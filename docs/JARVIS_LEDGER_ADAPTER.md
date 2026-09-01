@@ -179,7 +179,42 @@ main(argv) -> int                                  # PASS=0, FAIL=1, ERROR=2
 | 인증 | 없음 | 필요 → 비밀값 취급이 새로 생김 |
 | 방향 | 단방향 | 단방향 유지 (write-back 금지) |
 
-## 9. 금지 (구현 시 하드 제약)
+## 9. CI projection smoke (P4.1)
+
+CI는 `validate` job 안에서 projection을 한 번 검증한다. **비권위 검증이며 ledger 저장이 아니다.**
+결과는 어디에도 보존되지 않고 승인에도 관여하지 않는다.
+
+```
+checkout → [projection smoke] → validator → discovery --check --strict → tests
+```
+
+**validator보다 앞에 두는 이유**는 `validate_admissions.py`가 실행 시
+`evidence/validation-result.json`을 다시 쓰기 때문이다. 뒤에 두면 projection이 커밋된 evidence가
+아니라 **그 run이 방금 만든 값**을 읽게 된다. 앞에 두어야 커밋된 evidence를 읽는다는 P4 계약이
+CI에서도 유지된다. 그 뒤로 validator가 레지스트리 무결성을, `--check --strict`가 evidence
+freshness와 승인 정책을 검증하는 순서는 그대로다.
+
+**`source_commit`은 `GITHUB_SHA`를 쓴다.** 이 값은 언제나 **실제로 체크아웃된 트리**를 가리킨다.
+
+| 이벤트 | `GITHUB_SHA`가 가리키는 것 |
+| --- | --- |
+| `pull_request` | 체크아웃된 merge tree (PR head와 base를 합친 커밋) |
+| `push` (main) | 병합된 main commit |
+
+`github.event.pull_request.head.sha`는 쓰지 않는다. 그 값은 체크아웃된 트리가 아니라 PR 브랜치
+끝을 가리키므로, projection이 실제로 읽은 파일들과 어긋난다.
+
+**출력은 `$RUNNER_TEMP`에만 만든다.** 저장소 경로에 쓰지 않고, artifact로 올리지 않으며, run이
+끝나면 폐기된다. 같은 `source_commit`으로 2회 생성해 `cmp`로 **byte-identical**임을 확인하고,
+생성된 JSON의 `source_commit`이 `GITHUB_SHA`와 정확히 같은지 확인한다.
+
+`FAIL`(exit 1)과 `ERROR`(exit 2)는 **둘 다 job을 실패시킨다.** `continue-on-error`를 쓰지 않는다.
+
+artifact 보존과 remote ledger 전송은 범위 밖이다. artifact를 쓰려면 `actions/upload-artifact`를
+먼저 정식 반입해야 하며 — 반입 전에는 `--strict`가 이를 `PENDING_ADMISSION`으로 차단한다 —
+그 심사는 별도 작업이다.
+
+## 10. 금지 (구현 시 하드 제약)
 
 - registry·evidence 쓰기 금지
 - `APPROVED`/`ADMITTED` **생성** 금지 — 읽어서 전달만

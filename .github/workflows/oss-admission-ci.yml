@@ -12,6 +12,24 @@ jobs:
       # Pinned to an immutable commit SHA per OSS_ADMISSION_POLICY.md rule 2.
       # Admitted as oss-actions-checkout in registry/oss-registry.json.
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Verify ledger projection
+        # Runs before the validator because validate_admissions.py rewrites
+        # evidence/validation-result.json: projecting afterwards would read that
+        # run's output instead of the committed evidence. This is a
+        # non-authoritative smoke test — output stays in RUNNER_TEMP, is never
+        # uploaded, and is discarded when the run ends.
+        env:
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: |
+          python3 scripts/project_ledger.py \
+            --source-commit "$SOURCE_COMMIT" \
+            --output "$RUNNER_TEMP/ledger-projection-a.json" > /dev/null
+          python3 scripts/project_ledger.py \
+            --source-commit "$SOURCE_COMMIT" \
+            --output "$RUNNER_TEMP/ledger-projection-b.json" > /dev/null
+          cmp "$RUNNER_TEMP/ledger-projection-a.json" \
+              "$RUNNER_TEMP/ledger-projection-b.json"
+          python3 -c 'import json, os, pathlib, sys; data=json.loads(pathlib.Path(os.environ["RUNNER_TEMP"], "ledger-projection-b.json").read_text(encoding="utf-8")); sys.exit(0 if data.get("source_commit") == os.environ["SOURCE_COMMIT"] else 1)'
       - name: Validate OSS admissions
         run: python3 scripts/validate_admissions.py
       - name: Discover OSS dependency candidates
