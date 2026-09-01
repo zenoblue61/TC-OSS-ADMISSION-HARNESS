@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TC-JARVIS ledger projection",
+  "description": "One-way projection of harness evidence into the TC-JARVIS ledger. The projection reports results; it never grants an admission. It carries no wall-clock timestamp: provenance is run_id plus source_commit, so identical inputs at one commit produce identical bytes. The ledger records receipt time downstream.",
+  "type": "object",
+  "required": ["projection_version", "generator", "run_id", "source_commit", "registry_version", "adapter_status", "registry_integrity", "scan_integrity", "summary", "admitted_sources", "review_queue", "errors"],
+  "properties": {
+    "projection_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "generator": {"const": "tc-jarvis-ledger-projection"},
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "sha256(source_commit + sha256(canonical(validation)) + sha256(canonical(discovery))), where canonical() is UTF-8 JSON with sort_keys=true and separators=(\",\", \":\"). Inputs that differ only in key order or whitespace therefore share a run_id. Duplicate-suppression key only; never a cache key, because validation is time-dependent (180-day review expiry)."
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Injected from git HEAD at projection time. Deliberately absent from the evidence files themselves so their byte determinism is preserved."
+    },
+    "registry_version": {"type": ["string", "null"]},
+    "adapter_status": {
+      "enum": ["PASS", "FAIL", "ERROR"],
+      "description": "PASS: determined and clean; published, exit 0. FAIL: determined and not clean (registry invalid or scan incomplete); published so the ledger records the failure, exit 1, and retrying cannot change it. ERROR: could not determine (missing/unparseable input, adapter fault); nothing is published because no trustworthy document can be produced, exit 2, and retry may help."
+    },
+    "registry_integrity": {
+      "enum": ["PASS", "FAIL", "UNKNOWN"],
+      "description": "Aggregate validation status, forwarded verbatim. UNKNOWN only when validation-result could not be read. Never computed per record: the harness does not publish record-level status."
+    },
+    "scan_integrity": {
+      "enum": ["OK", "FAIL", "UNKNOWN"],
+      "description": "Discovery scan_status, forwarded verbatim. When FAIL the candidate list is incomplete: an empty review_queue must not be read as clean."
+    },
+    "summary": {
+      "type": "object",
+      "required": ["admitted_sources", "review_queue", "admitted_match", "pending_admission", "unpinned_blocked"],
+      "properties": {
+        "admitted_sources": {"type": "integer", "minimum": 0},
+        "review_queue": {"type": "integer", "minimum": 0},
+        "admitted_match": {"type": "integer", "minimum": 0},
+        "pending_admission": {"type": "integer", "minimum": 0},
+        "unpinned_blocked": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "admitted_sources": {
+      "type": "array",
+      "description": "Authoritative records, projected from registry/oss-registry.json only. Sorted by id.",
+      "items": {
+        "type": "object",
+        "required": ["id", "source_record_id", "component", "source_url", "pinned_ref", "license_expression", "admission_status", "evidence_refs"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^oss\\.",
+            "description": "Copied verbatim from jarvis_ledger.ledger_id. Never derived from admission_id and never minted."
+          },
+          "source_record_id": {"type": "string", "pattern": "^oss-[a-z0-9-]+$"},
+          "component": {"type": "string", "minLength": 1},
+          "source_url": {"type": "string", "pattern": "^https://"},
+          "pinned_ref": {"type": "string", "minLength": 1},
+          "license_expression": {"type": "string", "minLength": 1},
+          "admission_status": {
+            "enum": ["PENDING", "APPROVED", "BLOCKED", "REVOKED"],
+            "description": "Registry status, forwarded verbatim. The adapter never produces this value from a discovery observation."
+          },
+          "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^evidence/"}}
+        },
+        "additionalProperties": false
+      }
+    },
+    "review_queue": {
+      "type": "array",
+      "description": "Non-authoritative observations, projected from evidence/discovery-result.json only. These are NOT ledger records: no id and no admission_status may appear here, which additionalProperties:false enforces. Sorted by candidate_id.",
+      "items": {
+        "type": "object",
+        "required": ["candidate_id", "discovery_status", "component", "source_url", "pinned_ref", "source_record_id", "declared_in"],
+        "properties": {
+          "candidate_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Queue-local identifier. Never promoted to a ledger id."
+          },
+          "discovery_status": {
+            "enum": ["ADMITTED_MATCH", "PENDING_ADMISSION", "UNPINNED_BLOCKED"],
+            "description": "An observation, deliberately in a different field from admission_status. ADMITTED_MATCH means 'matches an approved record', not 'is approved'."
+          },
+          "component": {"type": "string", "minLength": 1},
+          "source_url": {"type": "string", "minLength": 1},
+          "pinned_ref": {"type": ["string", "null"]},
+          "source_record_id": {
+            "type": ["string", "null"],
+            "description": "Set only when discovery_status is ADMITTED_MATCH; null otherwise. Never invented."
+          },
+          "declared_in": {"type": "array", "items": {"type": "string", "pattern": "^[^/]"}}
+        },
+        "additionalProperties": false
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Masked before projection: absolute paths reduced to a basename, URL userinfo stripped, known credential prefixes redacted. Sorted."
+    }
+  },
+  "additionalProperties": false
+}
