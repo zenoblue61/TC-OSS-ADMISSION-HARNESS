@@ -15,6 +15,7 @@
 ```bash
 python3 scripts/validate_admissions.py          # 레지스트리 검증 (P0~P2)
 python3 scripts/discover_dependencies.py        # 의존성 발견 (P3)
+python3 scripts/project_ledger.py               # TC-JARVIS ledger 투영 (P4)
 python3 -m unittest discover -s tests -v
 ```
 
@@ -133,9 +134,12 @@ git ls-remote --tags --refs https://github.com/<owner>/<repo> | grep 'refs/tags/
 
 각 승인 record의 `jarvis_ledger`는 TC-JARVIS master ledger에서 추적할 식별자와 상태를 담습니다. CI 결과는 `evidence/validation-result.json`에 생성하며, 이 파일을 상위 레저의 evidence reference로 연결할 수 있습니다. 발견 결과 `evidence/discovery-result.json`은 아직 승인되지 않은 유입 후보의 증거로 함께 연결합니다.
 
+`scripts/project_ledger.py`는 이 세 파일을 읽어 `schemas/jarvis-ledger-projection.schema.json`에 맞는 투영 문서를 만듭니다. 읽기 전용이며 registry·evidence를 쓰지 않고, `ledger_id`를 파생하지 않고 그대로 전달하며, 발견 후보에 `admission_status`를 부여하지 않습니다. CI는 매 run마다 같은 `GITHUB_SHA`로 두 번 실행해 byte-identical 여부를 확인합니다.
+
 ## 범위
 
 - **P0~P2**: admission contract, 레지스트리/정책 검증, GitHub Actions gate.
 - **P3**: 읽기 전용 의존성 발견과 PENDING 후보 증거 생성.
+- **P4**: TC-JARVIS ledger 투영 어댑터와 CI 결정성 스모크. 보고만 하며 승인을 만들지 않습니다.
 
 CVE 데이터베이스 연동, 자동 의존성 업데이트, 자동 승인, transitive 의존성 해석은 의도적으로 범위 밖입니다. 발견기는 선언된(declared) 의존성만 읽으며, 의존성 그래프를 해석하지 않습니다.
